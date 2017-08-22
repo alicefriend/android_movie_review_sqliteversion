@@ -45,7 +45,7 @@ public class DetailActivity extends AppCompatActivity implements LifecycleRegist
         Bundle extras = intent.getExtras();
         if (extras != null) {
             if (extras.containsKey("Movie")) {
-                movie = (Movie)extras.getSerializable("Movie");
+                movie = (Movie)extras.getParcelable("Movie");
             }
         }
 

@@ -3,6 +3,7 @@ package com.alicefriend.movie.movie_app.ui.detail;
 import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableField;
 
+import com.alicefriend.movie.movie_app.db.MovieDao;
 import com.alicefriend.movie.movie_app.domain.Movie;
 import com.alicefriend.movie.movie_app.domain.Review;
 import com.alicefriend.movie.movie_app.domain.Trailer;
@@ -26,13 +27,24 @@ import retrofit2.Response;
 public class DetailRepository {
 
     private final Movie movie;
+    private final MovieDao dao;
 
-    public DetailRepository(Movie movie) {
+
+    public DetailRepository(Movie movie, MovieDao dao) {
         this.movie = movie;
+        this.dao = dao;
+    }
+
+    public void addFavorite(Movie movie) {
+        dao.addFavorite(movie);
+    }
+
+    public void deleteFavorite(Movie movie) {
+        dao.deleteFavorite(movie);
     }
 
     public void reviews(MutableLiveData<List<Review>> reviewsLiveData, ObservableField<Boolean> loadFailed) {
-        RestServiceFactory.getInstance().getReviews(movie.getId(), RestService.api_key)
+        RestServiceFactory.getInstance().getReviews(movie.getMovieId(), RestService.api_key)
                 .enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -49,7 +61,7 @@ public class DetailRepository {
     }
 
     public void trailers(MutableLiveData<List<Trailer>> trailersLiveData, ObservableField<Boolean> loadFailed) {
-        RestServiceFactory.getInstance().getTrailers(movie.getId(), RestService.api_key)
+        RestServiceFactory.getInstance().getTrailers(movie.getMovieId(), RestService.api_key)
                 .enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {

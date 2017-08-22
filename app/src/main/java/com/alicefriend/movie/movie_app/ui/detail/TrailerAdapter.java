@@ -1,5 +1,6 @@
 package com.alicefriend.movie.movie_app.ui.detail;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -63,11 +64,14 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
 
         @Override
         public void onClick(View v) {
+            Context context = v.getContext();
             Trailer trailer = trailers.get(getAdapterPosition());
             final String baseUrl = "https://www.youtube.com/watch";
-
             Uri youtubeUri = Uri.parse(baseUrl).buildUpon().appendQueryParameter("v", trailer.getKey()).build();
-            v.getContext().startActivity(new Intent(Intent.ACTION_VIEW, youtubeUri));
+            Intent intent = new Intent(Intent.ACTION_VIEW, youtubeUri);
+            if(intent.resolveActivity(context.getPackageManager()) != null) {
+                v.getContext().startActivity(intent);
+            }
         }
     }
 }

@@ -40,10 +40,10 @@ public class MainViewModel extends AndroidViewModel {
     public void initModelData() {
         repository.getMovies("popular", popularMovies, loadPopularFailed);
         repository.getMovies("top_rated", topRatedMovies, loadTopRatedFailed);
-        storedMovies = repository.getStoredMovie();
+        storedMovies = repository.getFavoriteMovie();
     }
 
-    public LiveData<List<Movie>> getStoredMovies() {
+    public LiveData<List<Movie>> getFavoriteMovies() {
         return storedMovies;
     }
 

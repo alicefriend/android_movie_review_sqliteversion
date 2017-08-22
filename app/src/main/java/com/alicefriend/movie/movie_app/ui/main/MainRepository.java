@@ -34,6 +34,7 @@ public class MainRepository {
 
     public void getMovies(String criteria, MutableLiveData<List<Movie>> liveData,
                           ObservableField<Boolean> isFailed) {
+
         service.getMovie(criteria, RestService.api_key)
                 .enqueue(new Callback<JsonObject>() {
                     @Override
@@ -51,7 +52,7 @@ public class MainRepository {
                 });
     }
 
-    public LiveData<List<Movie>> getStoredMovie() {
-        return dao.getAllMovies();
+    public LiveData<List<Movie>> getFavoriteMovie() {
+        return dao.getFavoriteMovies();
     }
 }

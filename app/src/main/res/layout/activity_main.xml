@@ -76,7 +76,7 @@
                 <android.support.constraint.ConstraintLayout
                     android:id="@+id/error_view"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:visibility="@{viewModel.loadPopularFailed || viewModel.loadTopRatedFailed ? View.VISIBLE : View.GONE}">
                     <TextView
                         android:id="@+id/error_msg_load_movie"

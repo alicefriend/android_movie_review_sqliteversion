@@ -21,14 +21,20 @@ import android.view.MenuItem;
 
 import com.alicefriend.movie.movie_app.R;
 import com.alicefriend.movie.movie_app.databinding.ActivityMainBinding;
+import com.alicefriend.movie.movie_app.domain.Movie;
 import com.alicefriend.movie.movie_app.ui.settings.SettingsActivity;
+import com.alicefriend.movie.movie_app.util.Utils;
 import com.f2prateek.rx.preferences2.Preference;
 import com.f2prateek.rx.preferences2.RxSharedPreferences;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LifecycleRegistryOwner {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private final LifecycleRegistry mRegistry = new LifecycleRegistry(this);
+    private static final int LOADER_ID = 1;
 
     private ActivityMainBinding binding;
     private MainViewModel mainViewModel;
@@ -48,16 +54,24 @@ public class MainActivity extends AppCompatActivity implements LifecycleRegistry
         super.onCreate(savedInstanceState);
 
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+
+        mainViewModel.getPopularMovies().observe(this, movies -> mPopularAdapter.setMovies(movies));
+        mainViewModel.getTopRatedMovies().observe(this, movies -> mTopRateAdapter.setMovies(movies));
+        mainViewModel.getFavoriteMovies().observe(this, movies -> mFavoriteAdapter.setMovies(movies));
+
+        if(Utils.isOnline(this) == false && savedInstanceState != null){
+            Movie[] popularArray = (Movie[])savedInstanceState.getParcelableArray("popular");
+            Movie[] topRatedArray = (Movie[])savedInstanceState.getParcelableArray("topRated");
+            mainViewModel.getPopularMovies().setValue(Arrays.asList(popularArray));
+            mainViewModel.getTopRatedMovies().setValue(Arrays.asList(topRatedArray));
+        }
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         binding.setViewModel(mainViewModel);
 
         initAppBar();
         initRecyclerView();
         initPreferenceSetting();
-
-        mainViewModel.getPopularMovies().observe(this, movies -> mPopularAdapter.setMovies(movies));
-        mainViewModel.getTopRatedMovies().observe(this, movies -> mTopRateAdapter.setMovies(movies));
-        mainViewModel.getStoredMovies().observe(this, movies -> mFavoriteAdapter.setMovies(movies));
 
         binding.fab.setOnClickListener(v -> {
             Snackbar.make(findViewById(R.id.mainCoordinatorLayout),
@@ -151,18 +165,31 @@ public class MainActivity extends AppCompatActivity implements LifecycleRegistry
     }
 
     private void hideOption(int id) {
-        MenuItem item = menu.findItem(id);
-        item.setVisible(false);
+        if(menu != null) {
+            MenuItem item = menu.findItem(id);
+            item.setVisible(false);
+        }
     }
 
     private void showOption(int id) {
-        MenuItem item = menu.findItem(id);
-        item.setVisible(true);
+        if(menu != null) {
+            MenuItem item = menu.findItem(id);
+            item.setVisible(true);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        List<Movie> popularList = mainViewModel.getPopularMovies().getValue();
+        List<Movie> topRatedList = mainViewModel.getTopRatedMovies().getValue();
+        outState.putParcelableArray("popular", popularList.toArray(new Movie[popularList.size()]));
+        outState.putParcelableArray("topRated", topRatedList.toArray(new Movie[topRatedList.size()]));
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public LifecycleRegistry getLifecycle() {
         return mRegistry;
     }
-
 }

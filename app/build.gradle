@@ -73,9 +73,4 @@ dependencies {
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha8"
     compile 'com.android.support:design:26.0.0'
 
-    //dagger2
-    compile "com.google.dagger:dagger:2.8"
-    annotationProcessor "com.google.dagger:dagger-compiler:2.8"
-    provided 'javax.annotation:jsr250-api:1.0'
-    compile 'javax.inject:javax.inject:1'
 }

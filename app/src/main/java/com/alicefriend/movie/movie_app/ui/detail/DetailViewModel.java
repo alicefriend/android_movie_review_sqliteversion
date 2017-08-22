@@ -4,7 +4,6 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableField;
-import android.os.AsyncTask;
 
 import com.alicefriend.movie.movie_app.db.MovieDao;
 import com.alicefriend.movie.movie_app.domain.Movie;
@@ -22,7 +21,6 @@ public class DetailViewModel extends AndroidViewModel {
     private static final String TAG = DetailViewModel.class.getSimpleName();
 
     private DetailRepository repository;
-    private Application application;
 
     private Movie movie;
     private MutableLiveData<List<Review>> reviewsLiveData = new MutableLiveData<>();
@@ -34,8 +32,7 @@ public class DetailViewModel extends AndroidViewModel {
     public DetailViewModel(Application application, Movie movie) {
         super(application);
         this.movie = movie;
-        this.application = application;
-        repository = new DetailRepository(movie);
+        repository = new DetailRepository(movie, MovieDao.getInstance(application));
         repository.reviews(reviewsLiveData, loadReviewsFailed);
         repository.trailers(trailersLiveData, loadTrailersFailed);
         isFavorite = MovieDao.getInstance(application).isFavorite(movie);
@@ -47,28 +44,13 @@ public class DetailViewModel extends AndroidViewModel {
     }
 
     public void addFavorite() {
+        repository.addFavorite(movie);
         isFavorite.set(true);
-        new addAsyncTask(MovieDao.getInstance(application)).execute(movie);
     }
 
     public void deleteFavorite() {
+        repository.deleteFavorite(movie);
         isFavorite.set(false);
-        MovieDao.getInstance(application).deleteFavorite(movie);
-    }
-
-    private static class addAsyncTask extends AsyncTask<Movie, Void, Void> {
-
-        private MovieDao dao;
-
-        addAsyncTask(MovieDao dao) {
-            this.dao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final Movie... params) {
-            dao.addFavorite(params[0]);
-            return null;
-        }
     }
 
     public MutableLiveData<List<Review>> getReviewsLiveData() {
